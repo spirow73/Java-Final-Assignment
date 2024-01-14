@@ -82,6 +82,7 @@ A brief description of your application, including its purpose and overall funct
 
 This section provides an overview of the main components of the project and how they are organized.
 
+```
 project-name/
 │
 ├── src/ # Source files
@@ -124,6 +125,7 @@ project-name/
 ├── .gitignore # Specifies intentionally untracked files to ignore
 ├── README.md # Project overview and documentation
 └── pom.xml # Project build configuration for Maven
+```
 
 ### Key Components:
 
