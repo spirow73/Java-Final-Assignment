@@ -13,7 +13,7 @@ public class BookRequestProxy {
     }
 
     public void addRequest(BookRequestContext request, User user) {
-        if (user instanceof Admin) { // Comprobando si el usuario es una instancia de Admin
+        if (user instanceof Admin) {
             requestManager.addRequest(request);
         } else {
             System.out.println("Sólo los administradores pueden añadir solicitudes.");
