@@ -26,9 +26,7 @@ A brief description of your application, including its purpose and overall funct
   - [Structural Patterns](#structural-patterns)
   - [Behavioral Patterns](#behavioral-patterns)
 - [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Contributions](#contributions)
-- [Authors and Acknowledgments](#authors-and-acknowledgments)
+- [Authors](#authors)
 
 ## Design Patterns
 
@@ -82,7 +80,61 @@ A brief description of your application, including its purpose and overall funct
 
 ## Project Structure
 
-Describe how your project is organized. Include details about the directory structure and any relevant information on navigating the code.
+This section provides an overview of the main components of the project and how they are organized.
+
+project-name/
+│
+├── src/ # Source files
+│ ├── books/ # Book-related classes
+│ │ ├── Book.java # Represents a book
+│ │ └── ... # Other book-related classes
+│ │
+│ ├── commands/ # Command pattern implementations
+│ │ ├── Command.java # Command interface
+│ │ ├── LendBookCommand.java # Command for lending a book
+│ │ └── ReturnBookCommand.java # Command for returning a book
+│ │
+│ ├── context/ # Context for State and Strategy patterns
+│ │ ├── BookRequestContext.java # Represents a book request context
+│ │ └── BookRequestManager.java # Singleton managing book requests
+│ │
+│ ├── factory/ # Factories for user creation
+│ │ ├── UserFactory.java # Factory interface for users
+│ │ ├── AdminFactory.java # Factory for creating Admin users
+│ │ └── StudentFactory.java # Factory for creating Student users
+│ │
+│ ├── proxy/ # Proxy pattern
+│ │ └── BookRequestProxy.java # Proxy for managing book requests
+│ │
+│ ├── strategy/ # Strategy pattern for request filtering
+│ │ ├── RequestFilterStrategy.java # Strategy interface
+│ │ ├── ApprovedRequestFilterStrategy.java # Strategy for approved requests
+│ │ └── ... # Other filtering strategies
+│ │
+│ ├── users/ # User-related classes
+│ │ ├── User.java # Abstract class representing a user
+│ │ ├── Admin.java # Represents an admin user
+│ │ └── Student.java # Represents a student user
+│ │
+│ └── App.java # Main application entry point
+│
+├── test/ # Test files
+│ └── ... # Unit tests for various components
+│
+├── .gitignore # Specifies intentionally untracked files to ignore
+├── README.md # Project overview and documentation
+└── pom.xml # Project build configuration for Maven
+
+### Key Components:
+
+- _Books_: Contains classes related to book management.
+- _Commands_: Implementations of the Command pattern for book operations.
+- _Context_: Holds the context for the State and Strategy patterns, including the Singleton BookRequestManager.
+- _Factory_: Factories for creating different types of user objects.
+- _Proxy_: Proxy pattern implementation for book request management.
+- _Strategy_: Strategies for filtering book requests.
+- _Users_: Classes representing different types of users in the system.
+- _App.java_: The main entry point of the application.
 
 ## Authors
 
