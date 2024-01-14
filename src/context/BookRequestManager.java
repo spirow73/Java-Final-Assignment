@@ -2,13 +2,43 @@ package context;
 
 import java.util.ArrayList;
 import java.util.List;
+import strategy.RequestFilterStrategy;
 import java.util.stream.Collectors;
 
 public class BookRequestManager {
-    private List<BookRequestContext> requests = new ArrayList<>();
+    private static BookRequestManager instance;
+    private List<BookRequestContext> requests;
+    private RequestFilterStrategy filterStrategy;
+
+    private BookRequestManager() {
+        requests = new ArrayList<>();
+    }
+
+    public static synchronized BookRequestManager getInstance() {
+        if (instance == null) {
+            instance = new BookRequestManager();
+        }
+        return instance;
+    }
+
+    public void setFilterStrategy(RequestFilterStrategy filterStrategy) {
+        this.filterStrategy = filterStrategy;
+    }
+
+    public void applyFilterAndPrint() {
+        if (filterStrategy != null) {
+            filterStrategy.filterAndPrintRequests(this);
+        } else {
+            System.out.println("No filter strategy set.");
+        }
+    }
 
     public void addRequest(BookRequestContext request) {
         requests.add(request);
+    }
+
+    public List<BookRequestContext> getRequests() {
+        return new ArrayList<>(requests);
     }
 
     public List<BookRequestContext> getRequestsByState(Class<? extends BookRequestState> stateClass) {
@@ -29,8 +59,5 @@ public class BookRequestManager {
         }
     }
 
-    //
-    
-
-    // Métodos para obtener solicitudes en otros estados, si es necesario
+    // Aquí puedes añadir más métodos según sea necesario
 }
