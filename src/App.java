@@ -1,58 +1,53 @@
-import context.BookRequestManager;
-import context.BookRequestContext;
-import context.ApprovedState;
-import context.PendingState;
-import context.RejectedState;
-import factory.AdminFactory;
-import factory.StudentFactory;
-import factory.UserFactory;
-import proxy.BookRequestProxy;
+import facade.LibraryFacade;
+import factory.*;
+import repository.*;
 import books.Book;
-import commands.Command;
-import commands.LendBookCommand;
-import strategy.ApprovedRequestFilterStrategy;
-import strategy.PendingRequestFilterStrategy;
-import strategy.RejectedRequestFilterStrategy;
-import users.Admin;
-import users.Student;
-import users.User;
+import users.*;
+import context.*;
+import strategy.*;
+import proxy.*;
+import commands.*;
 
 public class App {
     public static void main(String[] args) {
-        // Obtener la instancia de BookRequestManager (Singleton)
-        BookRequestManager manager = BookRequestManager.getInstance();
+        // Crear instancias de las clases necesarias
+        BookRepository bookRepository = new BookRepositoryImpl();
+        BookRequestManager requestManager = BookRequestManager.getInstance();
+        AdminFactory adminFactory = new AdminFactory();
+        StudentFactory studentFactory = new StudentFactory();
 
-        // Crear un proxy para el BookRequestManager
-        BookRequestProxy proxy = new BookRequestProxy(manager);
+        LibraryFacade libraryFacade = new LibraryFacade(bookRepository, requestManager, adminFactory, studentFactory);
 
-        // Crear fábricas para usuarios
-        UserFactory adminFactory = new AdminFactory();
-        UserFactory studentFactory = new StudentFactory();
+        // Simular el escenario
+        // 1. Un usuario pide un libro
+        Book book1 = new Book("123456", "Libro Ejemplo", "Autor Ejemplo");
+        libraryFacade.addBook(book1.getIsbn(), book1.getTitle(), book1.getAuthor());
+        User student = libraryFacade.createStudent("1", "Estudiante Ejemplo", "estudiante@ejemplo.com");
+        libraryFacade.requestBook(book1, student);
 
-        // Crear un administrador y un estudiante
-        User admin = adminFactory.createUser("admin1", "Administrador", "admin@example.com");
-        User student = studentFactory.createUser("student1", "Estudiante", "student@example.com");
+        // Mostrar las peticiones
+        libraryFacade.displayBooks(new AllRequestsFilterStrategy());
 
-        // Crear libros
-        Book book1 = new Book("123456", "El Principito", "Antoine de Saint-Exupéry");
-        Book book2 = new Book("789012", "El Señor de los Anillos", "J. R. R. Tolkien");
+        // 2. Un administrador da permiso
+        User admin = libraryFacade.createAdmin("2", "Administrador Ejemplo", "admin@ejemplo.com");
+        BookRequestContext request = requestManager.getRequests().get(0); // Obtiene la primera solicitud
+        libraryFacade.approveRequest(request, admin);
 
-        // Crear solicitudes de libros
-        BookRequestContext request1 = new BookRequestContext(book1, (Student) student, manager);
-        BookRequestContext request2 = new BookRequestContext(book2, (Student) student, manager);
+        // 3. El usuario devuelve el libro
+        libraryFacade.returnBook(book1, student);
 
-        // Añadir solicitudes utilizando el proxy (solo el admin puede hacerlo)
-        proxy.addRequest(request1, admin); // Debería tener éxito
-        proxy.addRequest(request2, student); // Debería fallar
+        libraryFacade.displayBooks(new AvailableBooksFilterStrategy(bookRepository));
 
-        // Cambiar el estado de una solicitud y aplicar el estado
-        request1.approveRequest(); // Aprobar la solicitud
+        // 5. Otro usuario pide el mismo libro
+        User anotherStudent = libraryFacade.createStudent("3", "Otro Estudiante", "otroestudiante@ejemplo.com");
+        libraryFacade.requestBook(book1, anotherStudent);
 
-        // Ejecutar un comando (ejemplo: prestar un libro)
-        Command lendBookCommand = new LendBookCommand(book1, student);
-        lendBookCommand.execute(); // Ejecuta el comando de prestar libro
+        // 6. La petición es rechazada
+        BookRequestContext requestToReject = requestManager.getRequests().get(1); // Obtiene
+        // a segunda solicitud, por ejemplo
+        libraryFacade.rejectRequest(requestToReject, admin);
 
-        // Intentar aprobar una solicitud que ya ha sido aprobada
-        request1.approveRequest(); // Debería fallar
+        // 7. Mostrar los libros nuevamente
+        libraryFacade.displayBooks(new AllRequestsFilterStrategy());
     }
 }

@@ -1,85 +1,104 @@
 package facade;
 
-import java.util.List;
-
 import books.Book;
+import commands.Command;
+import commands.LendBookCommand;
+import commands.ReturnBookCommand;
 import context.BookRequestContext;
 import context.BookRequestManager;
-import context.BookRequestState;
 import repository.BookRepository;
 import strategy.RequestFilterStrategy;
-import users.Student;
+import users.*;
+import factory.*;
+import proxy.BookRequestProxy;
 
 public class LibraryFacade {
     private BookRepository bookRepository;
+    private BookRequestProxy requestProxy;
     private BookRequestManager requestManager;
+    private UserFactory userFactory; // Assuming a general factory, can be more specific if needed
 
-    public LibraryFacade(BookRepository bookRepository, BookRequestManager requestManager) {
+    private AdminFactory adminFactory;
+    private StudentFactory studentFactory;
+
+    // Constructor modificado para incluir las fábricas de usuarios
+    public LibraryFacade(BookRepository bookRepository, BookRequestManager requestManager,
+            AdminFactory adminFactory, StudentFactory studentFactory) {
         this.bookRepository = bookRepository;
+        this.requestProxy = new BookRequestProxy(requestManager);
         this.requestManager = requestManager;
+        this.adminFactory = adminFactory;
+        this.studentFactory = studentFactory;
     }
 
-    // Método para agregar un libro al repositorio
-    public void addBook(Book book) {
+    // Método para crear un estudiante
+    public User createStudent(String id, String name, String email) {
+        return studentFactory.createUser(id, name, email);
+    }
+
+    // Método para crear un administrador
+    public User createAdmin(String id, String name, String email) {
+        return adminFactory.createUser(id, name, email);
+    }
+
+    // Method to request a book
+    public void requestBook(Book book, User user) {
+        BookRequestContext request = new BookRequestContext(book, (Student) user, requestManager);
+        requestProxy.addRequest(request, user); // Assuming the proxy handles additional logic
+    }
+
+    // Method to approve a request
+    public void approveRequest(BookRequestContext request, User user) {
+        requestProxy.approveRequest(request, user); // Assuming the proxy handles additional logic
+    }
+
+    // Method to reject a request
+    public void rejectRequest(BookRequestContext request, User user) {
+        requestProxy.rejectRequest(request, user); // Assuming the proxy handles additional logic
+    }
+
+    // Method to add a book to the repository
+    public void addBook(String isbn, String title, String author) {
+        Book book = new Book(isbn, title, author);
         bookRepository.addBook(book);
     }
 
-    // Método para solicitar un libro
-    public void requestBook(Book book, Student student) {
-        BookRequestContext context = new BookRequestContext(book, student, requestManager);
-        context.applyState(); // Solicitar el libro (estado pendiente por defecto)
+    // Method to create a user
+    public User createUser(String type, String id, String name, String email) {
+        // Logic to determine the type of UserFactory to use based on 'type'
+        return userFactory.createUser(id, name, email); // Assuming a generic createUser method
     }
 
-    // Método para aprobar una solicitud de libro
-    
+    // Method to display books based on certain criteria
+    public void displayBooks(RequestFilterStrategy strategy) {
+        strategy.filterAndPrintRequests(requestManager);
+    }
 
-    // Método para mostrar todas las solicitudes pendientes
-    public void printRequestsByState(Class<? extends BookRequestState> stateClass) {
-        List<BookRequestContext> requests = requestManager.getRequestsByState(stateClass);
-        if (requests.isEmpty()) {
-            System.out.println("No hay solicitudes en el estado: " + stateClass.getSimpleName());
+    public void lendBook(BookRequestContext request, User user) {
+        if (user instanceof Admin) {
+            Command lendBookCommand = new LendBookCommand(request.getBook(), user);
+            lendBookCommand.execute();
         } else {
-            System.out.println("Solicitudes en el estado: " + stateClass.getSimpleName() + ":");
-            for (BookRequestContext request : requests) {
-                System.out.println(request.getRequestDetails());
-            }
+            System.out.println("Only administrators can lend books.");
+        }
+    }
+
+    public void returnBook(Book book, User user) {
+        if (user instanceof Admin) {
+            Command returnBookCommand = new ReturnBookCommand(book, user);
+            returnBookCommand.execute();
+        } else {
+            System.out.println("Only administrators can return books.");
         }
     }
 
     // Método para mostrar todos los libros
-    public void printAllBooks() {
+    public void showAllBooks() {
         bookRepository.showAllBooks();
     }
 
-    // Método para mostrar todos los libros disponibles
-    public void printAvailableBooks() {
+    // Método para mostrar libros disponibles (opcional)
+    public void showAvailableBooks() {
         bookRepository.showAvailableBooks();
     }
-
-    // Método para buscar un libro por ISBN
-    public Book findBookByIsbn(String isbn) {
-        return bookRepository.getBookByIsbn(isbn);
-    }
-
-    // Método para buscar un libro por título
-    public Book findBookByTitle(String title) {
-        for (Book book : bookRepository.getAllBooks()) {
-            if (book.getTitle().equals(title)) {
-                return book;
-            }
-        }
-        return null;
-    }
-
-    // Método para mostrar la información de un libro
-    public void printBookInfo(Book book) {
-        bookRepository.showBookInfo(book);
-    }
-
-    public void filterAndPrintRequests(RequestFilterStrategy strategy) {
-        strategy.filterAndPrintRequests(requestManager);
-    }
-
-    // Otros métodos para interactuar con el sistema de biblioteca
-    // Por ejemplo, listar todos los libros, buscar libros, etc.
 }
