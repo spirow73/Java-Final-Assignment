@@ -28,9 +28,9 @@ public class BookRequestContext {
         if (!(state instanceof ApprovedState)) {
             setState(new ApprovedState());
             applyState();
-            // Aquí puedes añadir lógica adicional, como registrar el préstamo del libro
+            // Here you can add additional logic, such as registering the book loan
         } else {
-            System.out.println("La solicitud ya ha sido aprobada previamente.");
+            System.out.println("The request has already been approved previously.");
         }
     }
 
@@ -39,16 +39,16 @@ public class BookRequestContext {
             setState(new RejectedState());
             applyState();
         } else {
-            System.out.println("La solicitud ya ha sido rechazada previamente.");
+            System.out.println("The request has already been rejected previously.");
         }
     }
 
-    // Método para obtener los detalles de la solicitud
+    // Method to get the request details
     public String getRequestDetails() {
         return "Book: " + book.getTitle() + ", Requested by: " + student.getName();
     }
 
-    // Métodos para acceder o modificar el libro o el estudiante
+    // Methods to access or modify the book or student
     public Book getBook() {
         return book;
     }
@@ -61,5 +61,5 @@ public class BookRequestContext {
         return state;
     }
 
-    // Otros métodos según sea necesario
+    // Other methods as needed
 }

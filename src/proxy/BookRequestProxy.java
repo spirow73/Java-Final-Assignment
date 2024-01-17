@@ -16,29 +16,29 @@ public class BookRequestProxy {
         if (user instanceof Admin) {
             requestManager.addRequest(request);
         } else {
-            System.out.println("Sólo los administradores pueden añadir solicitudes.");
+            System.out.println("Only administrators can add requests.");
         }
     }
 
-    // Método para aprobar una solicitud de libro
+    // Method to approve a book request
     public void approveRequest(BookRequestContext request, User user) {
         if (user instanceof Admin) {
-            // Lógica para aprobar la solicitud
+            // Logic to approve the request
             request.approveRequest();
         } else {
-            System.out.println("Sólo los administradores pueden aprobar solicitudes.");
+            System.out.println("Only administrators can approve requests.");
         }
     }
 
-    // Método para rechazar una solicitud de libro
+    // Method to reject a book request
     public void rejectRequest(BookRequestContext request, User user) {
         if (user instanceof Admin) {
-            // Lógica para rechazar la solicitud
+            // Logic to reject the request
             request.rejectRequest();
         } else {
-            System.out.println("Sólo los administradores pueden rechazar solicitudes.");
+            System.out.println("Only administrators can reject requests.");
         }
     }
 
-    // Aquí puedes añadir otros métodos delegados a requestManager si es necesario
+    // You can add other delegated methods to requestManager here if needed
 }

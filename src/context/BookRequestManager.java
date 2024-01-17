@@ -50,14 +50,14 @@ public class BookRequestManager {
     public void printRequestsByState(Class<? extends BookRequestState> stateClass) {
         List<BookRequestContext> requestsByState = getRequestsByState(stateClass);
         if (requestsByState.isEmpty()) {
-            System.out.println("No hay solicitudes en el estado: " + stateClass.getSimpleName());
+            System.out.println("No requests in state: " + stateClass.getSimpleName());
         } else {
-            System.out.println("Solicitudes en el estado: " + stateClass.getSimpleName() + ":");
+            System.out.println("Requests in state: " + stateClass.getSimpleName() + ":");
             for (BookRequestContext request : requestsByState) {
                 System.out.println(request.getRequestDetails());
             }
         }
     }
 
-    // Aquí puedes añadir más métodos según sea necesario
+    // You can add more methods here as needed
 }
